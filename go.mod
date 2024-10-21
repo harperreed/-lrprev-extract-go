@@ -14,4 +14,7 @@ require (
 	golang.org/x/sys v0.25.0 // indirect
 	golang.org/x/term v0.24.0 // indirect
 	fyne.io/fyne/v2 v2.1.0 // added dependency
+	fyne.io/fyne/v2/app v2.1.0 // added dependency
+	fyne.io/fyne/v2/container v2.1.0 // added dependency
+	fyne.io/fyne/v2/widget v2.1.0 // added dependency
 )
