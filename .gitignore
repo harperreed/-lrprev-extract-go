@@ -44,3 +44,4 @@ agent
 *.db-journal
 lrprev-extract
 output.txt
+go.sum
