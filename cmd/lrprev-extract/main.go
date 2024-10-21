@@ -15,7 +15,7 @@ func main() {
 	inputFile := flag.String("f", "", "Path to your file (.lrprev)")
 	outputDirectory := flag.String("o", "", "Path to output directory")
 	lightroomDB := flag.String("l", "", "Path to the lightroom catalog (.lrcat)")
-	includeSize := flag.Bool("include-size", false, "Include image size information in the file name output")
+	includeSize := flag.Bool("include-size", false, "Include image size information in the output file name")
 	flag.Parse()
 
 	if *inputDir == "" && *inputFile == "" {
