@@ -8,13 +8,25 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func GetOriginalFilePath(dbPath, uuid string) (string, string, error) {
+func OpenDatabase(dbPath string) (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
-		return "", "", fmt.Errorf("error opening database: %v", err)
+		return nil, fmt.Errorf("error opening database: %v", err)
+	}
+	return db, nil
+}
+
+func GetOriginalFilePath(dbPath, uuid string) (string, string, error) {
+	db, err := OpenDatabase(dbPath)
+	if err != nil {
+		return "", "", err
 	}
 	defer db.Close()
 
+	return getOriginalFilePath(db, uuid)
+}
+
+func getOriginalFilePath(db *sql.DB, uuid string) (string, string, error) {
 	query := `
 		SELECT agfile.id_global as uuid, root.absolutePath, agfolder.pathFromRoot, agfile.baseName
 		FROM AgLibraryFile agfile
@@ -24,7 +36,7 @@ func GetOriginalFilePath(dbPath, uuid string) (string, string, error) {
 	`
 
 	var absolutePath, pathFromRoot, baseName string
-	err = db.QueryRow(query, uuid).Scan(&uuid, &absolutePath, &pathFromRoot, &baseName)
+	err := db.QueryRow(query, uuid).Scan(&uuid, &absolutePath, &pathFromRoot, &baseName)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return "", "", fmt.Errorf("no entry found for UUID: %s", uuid)
