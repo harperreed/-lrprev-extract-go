@@ -70,7 +70,9 @@ func main() {
 			if err != nil {
 				fmt.Printf("Error processing file %s: %v\n", file, err)
 			}
-			bar.Add(1)
+			if err := bar.Add(1); err != nil {
+				fmt.Printf("Error updating progress bar: %v\n", err)
+			}
 		}
 	} else {
 		err = processFile(inputPath, *outputDirectory, *lightroomDB, *includeSize)
