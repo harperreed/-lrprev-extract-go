@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"image/jpeg"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -14,7 +13,7 @@ import (
 
 func ExtractLargestJPEGFromLRPREV(filePath, outputDir, dbPath string, includeSize bool) error {
 	fmt.Printf("Reading file: %s\n", filePath)
-	fileContents, err := ioutil.ReadFile(filePath)
+	fileContents, err := os.ReadFile(filePath)
 	if err != nil {
 		return fmt.Errorf("error reading file: %v", err)
 	}
@@ -74,7 +73,7 @@ func ExtractLargestJPEGFromLRPREV(filePath, outputDir, dbPath string, includeSiz
 	jpegPath := filepath.Join(finalOutputDir, newFilename)
 
 	fmt.Printf("Writing JPEG file: %s\n", jpegPath)
-	err = ioutil.WriteFile(jpegPath, jpegContents, 0644)
+	err = os.WriteFile(jpegPath, jpegContents, 0644)
 	if err != nil {
 		return fmt.Errorf("error writing JPEG file: %v", err)
 	}
