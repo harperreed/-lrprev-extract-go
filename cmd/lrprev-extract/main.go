@@ -7,10 +7,12 @@ import (
 	"os"
 	"path/filepath"
 
+	"lrprev-extract-go/internal/config"
 	"lrprev-extract-go/internal/extractor"
 )
 
 func main() {
+	configFile := flag.String("c", "", "Path to config file")
 	inputDir := flag.String("d", "", "Path to your lightroom directory (.lrdata)")
 	inputFile := flag.String("f", "", "Path to your file (.lrprev)")
 	outputDirectory := flag.String("o", "", "Path to output directory")
@@ -18,24 +20,53 @@ func main() {
 	includeSize := flag.Bool("include-size", false, "Include image size information in the output file name")
 	flag.Parse()
 
-	if *inputDir == "" && *inputFile == "" {
-		log.Fatal("Either --input-dir or --input-file must be supplied.")
+	var cfg *config.Config
+	var err error
+
+	if *configFile != "" {
+		cfg, err = config.LoadConfig(*configFile)
+		if err != nil {
+			log.Fatalf("Error loading config file: %v", err)
+		}
+	} else {
+		cfg = &config.Config{}
 	}
 
-	if *inputDir != "" && *inputFile != "" {
-		log.Fatal("Both --input-dir and --input-file were supplied. Only one is allowed at a time.")
+	// Merge command-line arguments with config file settings
+	if *inputDir != "" {
+		cfg.InputDir = *inputDir
+	}
+	if *inputFile != "" {
+		cfg.InputFile = *inputFile
+	}
+	if *outputDirectory != "" {
+		cfg.OutputDirectory = *outputDirectory
+	}
+	if *lightroomDB != "" {
+		cfg.LightroomDB = *lightroomDB
+	}
+	if *includeSize {
+		cfg.IncludeSize = *includeSize
 	}
 
-	if *outputDirectory == "" {
+	if cfg.InputDir == "" && cfg.InputFile == "" {
+		log.Fatal("Either input directory or input file must be supplied.")
+	}
+
+	if cfg.InputDir != "" && cfg.InputFile != "" {
+		log.Fatal("Both input directory and input file were supplied. Only one is allowed at a time.")
+	}
+
+	if cfg.OutputDirectory == "" {
 		log.Fatal("Output directory must be specified.")
 	}
 
-	inputPath := *inputDir
-	if *inputFile != "" {
-		inputPath = *inputFile
+	inputPath := cfg.InputDir
+	if cfg.InputFile != "" {
+		inputPath = cfg.InputFile
 	}
 
-	err := os.MkdirAll(*outputDirectory, os.ModePerm)
+	err = os.MkdirAll(cfg.OutputDirectory, os.ModePerm)
 	if err != nil {
 		log.Fatalf("Failed to create output directory: %v", err)
 	}
@@ -51,7 +82,7 @@ func main() {
 				return err
 			}
 			if !info.IsDir() && filepath.Ext(path) == ".lrprev" {
-				return processFile(path, *outputDirectory, *lightroomDB, *includeSize)
+				return processFile(path, cfg.OutputDirectory, cfg.LightroomDB, cfg.IncludeSize)
 			}
 			return nil
 		})
@@ -59,7 +90,7 @@ func main() {
 			log.Fatalf("Error processing directory: %v", err)
 		}
 	} else {
-		err = processFile(inputPath, *outputDirectory, *lightroomDB, *includeSize)
+		err = processFile(inputPath, cfg.OutputDirectory, cfg.LightroomDB, cfg.IncludeSize)
 		if err != nil {
 			log.Fatalf("Error processing file: %v", err)
 		}
