@@ -27,7 +27,7 @@ This project aims to facilitate the management of your Lightroom previews and is
 The main executable is `lrprev-extract`. You can invoke it from the command line with the following options:
 
 ```bash
-./lrprev-extract [-d <path-to-lightroom-directory> | -f <path-to-lrprev-file>] [-o <output-directory>] [-l <path-to-lrcat>] [-include-size] [-help]
+./lrprev-extract [-d <path-to-lightroom-directory> | -f <path-to-lrprev-file>] [-o <output-directory>] [-l <path-to-lrcat>] [-include-size] [-help] [-gui]
 ```
 
 - `-d`: Specify the path to a directory containing `.lrdata` files.
@@ -36,6 +36,7 @@ The main executable is `lrprev-extract`. You can invoke it from the command line
 - `-l`: Specify the path to your Lightroom catalog (.lrcat) [Optional].
 - `-include-size`: Include the size of the images in the filename of the output JPEGs [Optional].
 - `-help`: Display help information and usage examples.
+- `-gui`: Launch the GUI for selecting input files and directories.
 
 If you don't provide the required arguments, the tool will prompt you for the necessary information interactively.
 
@@ -66,7 +67,13 @@ If you don't provide the required arguments, the tool will prompt you for the ne
 ```
 This will prompt you for the necessary information step by step.
 
-6. To display help information:
+6. To launch the GUI:
+```bash
+./lrprev-extract -gui
+```
+This will open a graphical user interface for selecting input files and directories.
+
+7. To display help information:
 ```bash
 ./lrprev-extract -help
 ```
@@ -76,6 +83,7 @@ This will prompt you for the necessary information step by step.
 - **Dependencies**:
   - `github.com/mattn/go-sqlite3`: A pure Go SQLite driver.
   - `github.com/schollz/progressbar/v3`: A progress bar for console applications.
+  - `fyne.io/fyne/v2`: A cross-platform GUI toolkit for Go applications.
 
 ### Directory Structure
 ```plaintext
@@ -83,7 +91,8 @@ lrprev-extract-go/
 ├── README.md          # Documentation file
 ├── cmd                # Command line interface code
 │   └── lrprev-extract # Main executable for the tool
-│       └── main.go    # Entry point of the application
+│       ├── main.go    # Entry point of the application
+│       └── gui.go     # GUI implementation for the application
 ├── go.mod             # Go module file for dependencies
 ├── internal           # Internal logic for the application
 │   ├── cli            # CLI interaction logic
@@ -98,6 +107,7 @@ lrprev-extract-go/
 
 ### File Descriptions
 - **`main.go`**: The main application entry point that handles command-line arguments, interactive prompts, and invokes the appropriate functions for file processing.
+- **`gui.go`**: Contains the implementation of the graphical user interface using the Fyne library.
 - **`cli.go`**: Contains functions for interactive prompts and input validation.
 - **`database.go`**: Contains functions for interacting with the Lightroom catalog database to retrieve original file paths.
 - **`extractor.go`**: Implements the logic to read `.lrprev` files, extract JPEGs, and manage the output with detailed progress reporting.
