@@ -1,59 +1,75 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"os"
 	"path/filepath"
+	"log"
+	"fmt"
 
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
-	"github.com/schollz/progressbar/v3"
 )
 
 func runGUI() {
 	a := app.New()
-	w := a.NewWindow("LRPrev Extractor")
+	w := a.NewWindow("Lightroom Preview Extractor")
 
 	inputDirEntry := widget.NewEntry()
-	inputDirEntry.SetPlaceHolder("Path to your lightroom directory (.lrdata)")
-
-	inputFileEntry := widget.NewEntry()
-	inputFileEntry.SetPlaceHolder("Path to your file (.lrprev)")
+	inputDirEntry.SetPlaceHolder("Input Directory")
 
 	outputDirEntry := widget.NewEntry()
-	outputDirEntry.SetPlaceHolder("Path to output directory")
+	outputDirEntry.SetPlaceHolder("Output Directory")
 
 	lightroomDBEntry := widget.NewEntry()
-	lightroomDBEntry.SetPlaceHolder("Path to the lightroom catalog (.lrcat) [optional]")
+	lightroomDBEntry.SetPlaceHolder("Lightroom Catalog Path")
 
-	includeSizeCheck := widget.NewCheck("Include image size information in the output file name", nil)
+	includeSizeCheck := widget.NewCheck("Include Image Size in Filename", nil)
+
+	inputDirButton := widget.NewButton("Select Input Directory", func() {
+		dialog.ShowFolderOpen(func(uri fyne.ListableURI, err error) {
+			if uri != nil {
+				inputDirEntry.SetText(uri.Path())
+			}
+		}, w)
+	})
+
+	outputDirButton := widget.NewButton("Select Output Directory", func() {
+		dialog.ShowFolderOpen(func(uri fyne.ListableURI, err error) {
+			if uri != nil {
+				outputDirEntry.SetText(uri.Path())
+			}
+		}, w)
+	})
+
+	lightroomDBButton := widget.NewButton("Select Lightroom Catalog", func() {
+		dialog.ShowFileOpen(func(uri fyne.URIReadCloser, err error) {
+			if uri != nil {
+				lightroomDBEntry.SetText(uri.URI().Path())
+			}
+		}, w)
+	})
 
 	startButton := widget.NewButton("Start", func() {
 		inputDir := inputDirEntry.Text
-		inputFile := inputFileEntry.Text
 		outputDir := outputDirEntry.Text
 		lightroomDB := lightroomDBEntry.Text
 		includeSize := includeSizeCheck.Checked
-
-		inputPath := inputDir
-		if inputFile != "" {
-			inputPath = inputFile
-		}
 
 		err := os.MkdirAll(outputDir, os.ModePerm)
 		if err != nil {
 			log.Fatalf("Failed to create output directory: %v", err)
 		}
 
-		fileInfo, err := os.Stat(inputPath)
+		fileInfo, err := os.Stat(inputDir)
 		if err != nil {
 			log.Fatalf("Error accessing input path: %v", err)
 		}
 
 		if fileInfo.IsDir() {
-			files, err := filepath.Glob(filepath.Join(inputPath, "**/*.lrprev"))
+			files, err := filepath.Glob(filepath.Join(inputDir, "**/*.lrprev"))
 			if err != nil {
 				log.Fatalf("Error finding .lrprev files: %v", err)
 			}
@@ -70,7 +86,7 @@ func runGUI() {
 				}
 			}
 		} else {
-			err = processFile(inputPath, outputDir, lightroomDB, includeSize)
+			err = processFile(inputDir, outputDir, lightroomDB, includeSize)
 			if err != nil {
 				log.Fatalf("Error processing file: %v", err)
 			}
@@ -81,9 +97,11 @@ func runGUI() {
 
 	w.SetContent(container.NewVBox(
 		inputDirEntry,
-		inputFileEntry,
+		inputDirButton,
 		outputDirEntry,
+		outputDirButton,
 		lightroomDBEntry,
+		lightroomDBButton,
 		includeSizeCheck,
 		startButton,
 	))
