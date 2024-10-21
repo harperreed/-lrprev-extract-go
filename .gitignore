@@ -1,0 +1,46 @@
+.aider*
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+*.bin
+*.out
+*.test
+
+# Output of the go coverage tool
+*.cov
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+
+# Dependency directories (vendor/)
+vendor/
+
+# Go module files
+go.sum
+
+# IDE/editor-specific files
+.idea/
+.vscode/
+*.swp
+
+# Ignore the binary itself
+/myapp
+
+output.txt
+vendor
+pb_data/
+go.sum
+.DS_Store
+config.yaml
+agent
+*.db
+
+.env
+
+*.db-journal
+lrprev-extract
+output.txt
