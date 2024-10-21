@@ -4,10 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"lrprev-extract-go/internal/extractor"
 	"os"
 	"path/filepath"
-
-	"lrprev-extract-go/internal/extractor"
 )
 
 func main() {
