@@ -121,13 +121,3 @@ func TestGetOriginalFilePathQueryError(t *testing.T) {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
 }
-
-package database
-
-import (
-	"database/sql"
-	"errors"
-	"testing"
-
-	"github.com/DATA-DOG/go-sqlmock"
-)
