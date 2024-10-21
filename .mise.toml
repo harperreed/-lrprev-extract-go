@@ -8,13 +8,13 @@ description = 'Remove all the various output.txts'                              
 
 
 [tasks]
-build = "go build -o agent cmd/newsagent/main.go"
+build = "go build -o agent cmd/lrprev-extract/main.go"
 test = "go test -v ./... -coverprofile=coverage.out -covermode=atomic && go tool cover -html=coverage.out -o coverage.html"
 clean = "go clean && rm -f agent"
 lint = "golangci-lint run"
 lint-fix = "golangci-lint run --fix"
 lint-all = "golangci-lint run --enable-all"
 lint-all-fix = "golangci-lint run --enable-all --fix"
-run = "go run cmd/newsagent/main.go"
+run = "go run cmd/lrprev-extract/main.go"
 deps = "go get ./... && go mod tidy"
 all = { depends = ["lint", "test", "build"] }
