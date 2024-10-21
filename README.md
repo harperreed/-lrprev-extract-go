@@ -27,7 +27,7 @@ This project aims to facilitate the management of your Lightroom previews and is
 The main executable is `lrprev-extract`. You can invoke it from the command line with the following options:
 
 ```bash
-./lrprev-extract -d <path-to-lightroom-directory> | -f <path-to-lrprev-file> -o <output-directory> [-l <path-to-lrcat>] [-include-size]
+./lrprev-extract [-d <path-to-lightroom-directory> | -f <path-to-lrprev-file>] [-o <output-directory>] [-l <path-to-lrcat>] [-include-size] [-help]
 ```
 
 - `-d`: Specify the path to a directory containing `.lrdata` files.
@@ -35,21 +35,47 @@ The main executable is `lrprev-extract`. You can invoke it from the command line
 - `-o`: Specify the output directory where the extracted JPEGs should be saved.
 - `-l`: Specify the path to your Lightroom catalog (.lrcat) [Optional].
 - `-include-size`: Include the size of the images in the filename of the output JPEGs [Optional].
+- `-help`: Display help information and usage examples.
+
+If you don't provide the required arguments, the tool will prompt you for the necessary information interactively.
 
 ### Example Usage
-To extract images from a directory:
+1. To extract images from a directory:
 ```bash
 ./lrprev-extract -d /path/to/lightroom -o /path/to/output
 ```
-To extract images from a single `.lrprev` file:
+
+2. To extract images from a single `.lrprev` file:
 ```bash
 ./lrprev-extract -f /path/to/file.lrprev -o /path/to/output
+```
+
+3. To extract images and include size information in the filename:
+```bash
+./lrprev-extract -d /path/to/lightroom -o /path/to/output -include-size
+```
+
+4. To extract images and use the Lightroom catalog for original file paths:
+```bash
+./lrprev-extract -d /path/to/lightroom -o /path/to/output -l /path/to/catalog.lrcat
+```
+
+5. To use the interactive mode:
+```bash
+./lrprev-extract
+```
+This will prompt you for the necessary information step by step.
+
+6. To display help information:
+```bash
+./lrprev-extract -help
 ```
 
 ## 🛠️ Tech Info
 - **Language**: Go
 - **Dependencies**:
   - `github.com/mattn/go-sqlite3`: A pure Go SQLite driver.
+  - `github.com/schollz/progressbar/v3`: A progress bar for console applications.
 
 ### Directory Structure
 ```plaintext
@@ -60,6 +86,8 @@ lrprev-extract-go/
 │       └── main.go    # Entry point of the application
 ├── go.mod             # Go module file for dependencies
 ├── internal           # Internal logic for the application
+│   ├── cli            # CLI interaction logic
+│   │   └── cli.go
 │   ├── database       # Database interaction logic
 │   │   └── database.go
 │   ├── extractor      # Extraction logic for JPEGs
@@ -69,9 +97,10 @@ lrprev-extract-go/
 ```
 
 ### File Descriptions
-- **`main.go`**: The main application entry point that handles command-line arguments and invokes the appropriate functions for file processing.
+- **`main.go`**: The main application entry point that handles command-line arguments, interactive prompts, and invokes the appropriate functions for file processing.
+- **`cli.go`**: Contains functions for interactive prompts and input validation.
 - **`database.go`**: Contains functions for interacting with the Lightroom catalog database to retrieve original file paths.
-- **`extractor.go`**: Implements the logic to read `.lrprev` files, extract JPEGs, and manage the output.
+- **`extractor.go`**: Implements the logic to read `.lrprev` files, extract JPEGs, and manage the output with detailed progress reporting.
 - **`utils.go`**: Contains utility functions, including the extraction of UUIDs from filenames.
 
 Feel free to contribute! We welcome any improvements or bug fixes. 😊

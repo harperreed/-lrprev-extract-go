@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/schollz/progressbar/v3"
+	"lrprev-extract-go/internal/cli"
 	"lrprev-extract-go/internal/extractor"
 )
 
@@ -16,18 +18,28 @@ func main() {
 	outputDirectory := flag.String("o", "", "Path to output directory")
 	lightroomDB := flag.String("l", "", "Path to the lightroom catalog (.lrcat)")
 	includeSize := flag.Bool("include-size", false, "Include image size information in the output file name")
+	help := flag.Bool("help", false, "Show help information")
 	flag.Parse()
 
-	if *inputDir == "" && *inputFile == "" {
-		log.Fatal("Either --input-dir or --input-file must be supplied.")
+	if *help {
+		printHelp()
+		return
 	}
 
-	if *inputDir != "" && *inputFile != "" {
-		log.Fatal("Both --input-dir and --input-file were supplied. Only one is allowed at a time.")
+	if *inputDir == "" && *inputFile == "" {
+		*inputDir = cli.PromptForInput("Enter the path to your lightroom directory (.lrdata) or file (.lrprev): ")
 	}
 
 	if *outputDirectory == "" {
-		log.Fatal("Output directory must be specified.")
+		*outputDirectory = cli.PromptForInput("Enter the path to the output directory: ")
+	}
+
+	if *lightroomDB == "" {
+		*lightroomDB = cli.PromptForInput("Enter the path to the lightroom catalog (.lrcat) [optional]: ")
+	}
+
+	if !*includeSize {
+		*includeSize = cli.PromptForBool("Include image size information in the output file name? (y/n): ")
 	}
 
 	inputPath := *inputDir
@@ -46,17 +58,19 @@ func main() {
 	}
 
 	if fileInfo.IsDir() {
-		err = filepath.Walk(inputPath, func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if !info.IsDir() && filepath.Ext(path) == ".lrprev" {
-				return processFile(path, *outputDirectory, *lightroomDB, *includeSize)
-			}
-			return nil
-		})
+		files, err := filepath.Glob(filepath.Join(inputPath, "**/*.lrprev"))
 		if err != nil {
-			log.Fatalf("Error processing directory: %v", err)
+			log.Fatalf("Error finding .lrprev files: %v", err)
+		}
+
+		bar := progressbar.Default(int64(len(files)))
+
+		for _, file := range files {
+			err := processFile(file, *outputDirectory, *lightroomDB, *includeSize)
+			if err != nil {
+				fmt.Printf("Error processing file %s: %v\n", file, err)
+			}
+			bar.Add(1)
 		}
 	} else {
 		err = processFile(inputPath, *outputDirectory, *lightroomDB, *includeSize)
@@ -64,9 +78,22 @@ func main() {
 			log.Fatalf("Error processing file: %v", err)
 		}
 	}
+
+	fmt.Println("Processing complete!")
 }
 
 func processFile(filePath, outputDir, dbPath string, includeSize bool) error {
 	fmt.Printf("Processing file: %s\n", filePath)
 	return extractor.ExtractLargestJPEGFromLRPREV(filePath, outputDir, dbPath, includeSize)
+}
+
+func printHelp() {
+	fmt.Println("lrprev-extract-go: Extract JPEG images from Lightroom preview files")
+	fmt.Println("\nUsage:")
+	fmt.Println("  lrprev-extract [options]")
+	fmt.Println("\nOptions:")
+	flag.PrintDefaults()
+	fmt.Println("\nExamples:")
+	fmt.Println("  lrprev-extract -d /path/to/lightroom/directory -o /path/to/output")
+	fmt.Println("  lrprev-extract -f /path/to/file.lrprev -o /path/to/output -l /path/to/catalog.lrcat")
 }
