@@ -73,6 +73,14 @@ lrprev-extract-go/
 - **`database.go`**: Contains functions for interacting with the Lightroom catalog database to retrieve original file paths.
 - **`extractor.go`**: Implements the logic to read `.lrprev` files, extract JPEGs, and manage the output.
 - **`utils.go`**: Contains utility functions, including the extraction of UUIDs from filenames.
+- **`utils_test.go`**: Contains unit tests for the utility functions in `utils.go`.
+
+### Testing
+The project includes unit tests for the utility functions. To run the tests, use the following command:
+
+```bash
+go test ./internal/utils
+```
 
 Feel free to contribute! We welcome any improvements or bug fixes. 😊
 
