@@ -23,6 +23,11 @@ This project aims to facilitate the management of your Lightroom previews and is
     go build -o lrprev-extract ./cmd/lrprev-extract
     ```
 
+3. Install required dependencies on Linux:
+    ```bash
+    sudo apt-get install -y libgl1-mesa-dev xorg-dev
+    ```
+
 ### Commands
 The main executable is `lrprev-extract`. You can invoke it from the command line with the following options:
 
@@ -83,7 +88,11 @@ This will open a graphical user interface for selecting input files and director
 - **Dependencies**:
   - `github.com/mattn/go-sqlite3`: A pure Go SQLite driver.
   - `github.com/schollz/progressbar/v3`: A progress bar for console applications.
+
   - `fyne.io/fyne/v2`: A cross-platform GUI toolkit for Go applications.
+
+  - `github.com/rivo/tview`: A rich TUI library for Go.
+
 
 ### Directory Structure
 ```plaintext
@@ -113,6 +122,14 @@ lrprev-extract-go/
 - **`extractor.go`**: Implements the logic to read `.lrprev` files, extract JPEGs, and manage the output with detailed progress reporting.
 - **`utils.go`**: Contains utility functions, including the extraction of UUIDs from filenames.
 - **`utils_test.go`**: Contains unit tests for the utility functions in `utils.go`.
+
+### TUI Features
+The TUI (Text User Interface) has been enhanced with the following features:
+
+- **Overall Extraction Progress**: Displays an overall extraction progress indicator.
+- **Enhanced Progress Bars**: Multiple progress bars for different stages of the extraction process, such as scanning directories, processing files, and writing output. Different colors for different progress bars to make it easier to distinguish between them. A percentage completion indicator next to each progress bar.
+- **Real-time Logs and Status Updates**: Displays real-time logs and status updates in a separate section of the TUI. Shows detailed information about the current file being processed, including its name and size. Error messages and warnings are displayed in a distinct color to make them stand out.
+- **Interactive User Input**: Users can pause, resume, or cancel the extraction process using keyboard shortcuts. Options for users to change settings, such as the output directory or whether to include image size information, without restarting the application. A help screen that displays available commands and their descriptions.
 
 ### Testing
 The project includes unit tests for the utility functions. To run the tests, use the following command:

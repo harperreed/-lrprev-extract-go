@@ -10,7 +10,9 @@ import (
 	"lrprev-extract-go/internal/cli"
 	"lrprev-extract-go/internal/extractor"
 
-	"github.com/schollz/progressbar/v3"
+
+	"github.com/rivo/tview"
+
 )
 
 func main() {
@@ -64,35 +66,68 @@ func main() {
 		log.Fatalf("Error accessing input path: %v", err)
 	}
 
-	if fileInfo.IsDir() {
-		files, err := filepath.Glob(filepath.Join(inputPath, "**/*.lrprev"))
-		if err != nil {
-			log.Fatalf("Error finding .lrprev files: %v", err)
-		}
+	app := tview.NewApplication()
+	flex := tview.NewFlex().SetDirection(tview.FlexRow)
 
-		bar := progressbar.Default(int64(len(files)))
+	// Create a text view for logs
+	logView := tview.NewTextView().
+		SetDynamicColors(true).
+		SetScrollable(true).
+		SetChangedFunc(func() {
+			app.Draw()
+		})
 
-		for _, file := range files {
-			err := processFile(file, *outputDirectory, *lightroomDB, *includeSize)
+	// Create a gauge for progress
+	gauge := tview.NewTextView().
+		SetDynamicColors(true).
+		SetTextAlign(tview.AlignCenter)
+
+	// Add items to the flex container
+	flex.AddItem(gauge, 1, 0, false)
+	flex.AddItem(logView, 0, 1, false)
+
+	go func() {
+		if fileInfo.IsDir() {
+			files, err := filepath.Glob(filepath.Join(inputPath, "**/*.lrprev"))
 			if err != nil {
-				fmt.Printf("Error processing file %s: %v\n", file, err)
+				fmt.Fprintf(logView, "[red]Error finding .lrprev files: %v\n", err)
+				app.Stop()
+				return
 			}
-			if err := bar.Add(1); err != nil {
-				fmt.Printf("Error updating progress bar: %v\n", err)
-			}
-		}
-	} else {
-		err = processFile(inputPath, *outputDirectory, *lightroomDB, *includeSize)
-		if err != nil {
-			log.Fatalf("Error processing file: %v", err)
-		}
-	}
 
-	fmt.Println("Processing complete!")
+			totalFiles := len(files)
+			for i, file := range files {
+				progress := int(float64(i+1) / float64(totalFiles) * 100)
+				gauge.Clear()
+				fmt.Fprintf(gauge, "[yellow]Progress: [white]%d%%", progress)
+				app.Draw()
+
+				err := processFile(file, *outputDirectory, *lightroomDB, *includeSize, logView)
+				if err != nil {
+					fmt.Fprintf(logView, "[red]Error processing file %s: %v\n", file, err)
+				}
+			}
+		} else {
+			gauge.Clear()
+			fmt.Fprintf(gauge, "[yellow]Progress: [white]0%%")
+			err = processFile(inputPath, *outputDirectory, *lightroomDB, *includeSize, logView)
+			if err != nil {
+				fmt.Fprintf(logView, "[red]Error processing file: %v\n", err)
+			}
+			fmt.Fprintf(gauge, "[yellow]Progress: [white]100%%")
+		}
+
+		fmt.Fprintln(logView, "[green]Processing complete!")
+		app.Stop()
+	}()
+
+	if err := app.SetRoot(flex, true).Run(); err != nil {
+		log.Fatalf("Error running application: %v", err)
+	}
 }
 
-func processFile(filePath, outputDir, dbPath string, includeSize bool) error {
-	fmt.Printf("Processing file: %s\n", filePath)
+func processFile(filePath, outputDir, dbPath string, includeSize bool, logView *tview.TextView) error {
+	fmt.Fprintf(logView, "Processing file: %s\n", filePath)
 	return extractor.ExtractLargestJPEGFromLRPREV(filePath, outputDir, dbPath, includeSize)
 }
 

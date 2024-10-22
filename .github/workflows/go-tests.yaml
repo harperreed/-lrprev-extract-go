@@ -64,6 +64,8 @@ jobs:
               run: go mod tidy
             - name: Install dependencies
               run: go mod download
+            - name: Install required packages
+              run: sudo apt-get install -y libgl1-mesa-dev xorg-dev
             - name: Check and set OPENAI_API_KEY
               run: |
                   if [ -z "${{ secrets.OPENAI_API_KEY }}" ]; then

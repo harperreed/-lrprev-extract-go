@@ -3,10 +3,16 @@ module lrprev-extract-go
 go 1.23.2
 
 require (
+
 	fyne.io/fyne/v2 v2.5.2
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/schollz/progressbar/v3 v3.16.1
+
+	github.com/DATA-DOG/go-sqlmock v1.5.2
+	github.com/mattn/go-sqlite3 v1.14.24
+	github.com/rivo/tview v0.0.0-20241016194538-c5e4fb24af13
+
 	github.com/stretchr/testify v1.9.0
 )
 
@@ -14,6 +20,7 @@ require (
 	fyne.io/systray v1.11.0 // indirect
 	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+
 	github.com/fredbi/uri v1.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/fyne-io/gl-js v0.0.0-20220119005834-d2da28d9ccfe // indirect
@@ -41,5 +48,16 @@ require (
 	golang.org/x/sys v0.25.0 // indirect
 	golang.org/x/term v0.24.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
+
+	github.com/gdamore/encoding v1.0.0 // indirect
+	github.com/gdamore/tcell/v2 v2.7.4 // indirect
+	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
+	github.com/mattn/go-runewidth v0.0.15 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/rivo/uniseg v0.4.7 // indirect
+	golang.org/x/sys v0.17.0 // indirect
+	golang.org/x/term v0.17.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
+
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
