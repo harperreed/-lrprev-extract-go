@@ -10,6 +10,9 @@ This project aims to facilitate the management of your Lightroom previews and is
 ### Prerequisites
 - Go 1.23.2 or later
 - Access to a Lightroom catalog (`.lrcat`) if you want to structure your output by original paths.
+- For Linux users:
+  - OpenGL development libraries
+  - X11 development libraries
 
 ### Installation
 1. Clone the repository:
@@ -18,7 +21,20 @@ This project aims to facilitate the management of your Lightroom previews and is
     cd lrprev-extract-go
     ```
 
-2. Compile the code:
+2. For Linux users, install the required development packages:
+    ```bash
+    # For Ubuntu/Debian:
+    sudo apt-get update
+    sudo apt-get install libgl1-mesa-dev xorg-dev
+
+    # For Fedora:
+    sudo dnf install mesa-libGL-devel libX11-devel libXcursor-devel libXrandr-devel libXinerama-devel libXi-devel
+
+    # For Arch Linux:
+    sudo pacman -S mesa libx11 libxcursor libxrandr libxinerama libxi
+    ```
+
+3. Compile the code:
     ```bash
     go build -o lrprev-extract ./cmd/lrprev-extract
     ```
@@ -76,6 +92,8 @@ This will prompt you for the necessary information step by step.
 - **Dependencies**:
   - `github.com/mattn/go-sqlite3`: A pure Go SQLite driver.
   - `github.com/schollz/progressbar/v3`: A progress bar for console applications.
+  - `github.com/go-gl/gl/v2.1/gl`: OpenGL bindings for Go.
+  - `github.com/go-gl/glfw/v3.3/glfw`: GLFW bindings for Go.
 
 ### Directory Structure
 ```plaintext

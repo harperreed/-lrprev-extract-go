@@ -7,6 +7,8 @@ require github.com/mattn/go-sqlite3 v1.14.24
 require github.com/DATA-DOG/go-sqlmock v1.5.2
 
 require (
+	github.com/go-gl/gl v0.0.0-20211210172815-726fda9656d6
+	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20240307211618-a69d953ea142
 	github.com/schollz/progressbar/v3 v3.16.1
 	github.com/stretchr/testify v1.9.0
 )
