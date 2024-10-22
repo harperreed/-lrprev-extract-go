@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/rivo/tview"
 	"github.com/gdamore/tcell/v2"
