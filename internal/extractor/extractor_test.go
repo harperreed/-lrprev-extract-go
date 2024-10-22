@@ -2,25 +2,24 @@ package extractor
 
 import (
 	"database/sql"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestExtractLargestJPEGFromLRPREV_Success(t *testing.T) {
 	// Create a temporary directory for the test
-	tempDir, err := ioutil.TempDir("", "lrprev_test")
+	tempDir, err := os.MkdirTemp("", "lrprev_test")
 	assert.NoError(t, err)
 	defer os.RemoveAll(tempDir)
 
 	// Create a mock LRPREV file
 	lrprevPath := filepath.Join(tempDir, "test-12345678-1234-1234-1234-123456789012.lrprev")
 	jpegContent := []byte{0xFF, 0xD8, 0xFF, 0xD9} // Minimal valid JPEG
-	err = ioutil.WriteFile(lrprevPath, append([]byte("prefix data"), jpegContent...), 0644)
+	err = os.WriteFile(lrprevPath, append([]byte("prefix data"), jpegContent...), 0644)
 	assert.NoError(t, err)
 
 	// Run the extraction
@@ -32,7 +31,7 @@ func TestExtractLargestJPEGFromLRPREV_Success(t *testing.T) {
 	_, err = os.Stat(extractedPath)
 	assert.NoError(t, err)
 
-	extractedContent, err := ioutil.ReadFile(extractedPath)
+	extractedContent, err := os.ReadFile(extractedPath)
 	assert.NoError(t, err)
 	assert.Equal(t, jpegContent, extractedContent)
 }
@@ -45,13 +44,13 @@ func TestExtractLargestJPEGFromLRPREV_InvalidFilePath(t *testing.T) {
 
 func TestExtractLargestJPEGFromLRPREV_NoValidJPEG(t *testing.T) {
 	// Create a temporary directory for the test
-	tempDir, err := ioutil.TempDir("", "lrprev_test")
+	tempDir, err := os.MkdirTemp("", "lrprev_test")
 	assert.NoError(t, err)
 	defer os.RemoveAll(tempDir)
 
 	// Create a mock LRPREV file without a valid JPEG
 	lrprevPath := filepath.Join(tempDir, "test-12345678-1234-1234-1234-123456789012.lrprev")
-	err = ioutil.WriteFile(lrprevPath, []byte("not a valid JPEG"), 0644)
+	err = os.WriteFile(lrprevPath, []byte("not a valid JPEG"), 0644)
 	assert.NoError(t, err)
 
 	// Run the extraction
@@ -62,7 +61,7 @@ func TestExtractLargestJPEGFromLRPREV_NoValidJPEG(t *testing.T) {
 
 func TestExtractLargestJPEGFromLRPREV_WithDatabase(t *testing.T) {
 	// Create a temporary directory for the test
-	tempDir, err := ioutil.TempDir("", "lrprev_test")
+	tempDir, err := os.MkdirTemp("", "lrprev_test")
 	assert.NoError(t, err)
 	defer os.RemoveAll(tempDir)
 
@@ -85,7 +84,7 @@ func TestExtractLargestJPEGFromLRPREV_WithDatabase(t *testing.T) {
 	// Create a mock LRPREV file
 	lrprevPath := filepath.Join(tempDir, "test-12345678-1234-1234-1234-123456789012.lrprev")
 	jpegContent := []byte{0xFF, 0xD8, 0xFF, 0xD9} // Minimal valid JPEG
-	err = ioutil.WriteFile(lrprevPath, append([]byte("prefix data"), jpegContent...), 0644)
+	err = os.WriteFile(lrprevPath, append([]byte("prefix data"), jpegContent...), 0644)
 	assert.NoError(t, err)
 
 	// Run the extraction
@@ -100,14 +99,14 @@ func TestExtractLargestJPEGFromLRPREV_WithDatabase(t *testing.T) {
 
 func TestExtractLargestJPEGFromLRPREV_WithoutDatabase(t *testing.T) {
 	// Create a temporary directory for the test
-	tempDir, err := ioutil.TempDir("", "lrprev_test")
+	tempDir, err := os.MkdirTemp("", "lrprev_test")
 	assert.NoError(t, err)
 	defer os.RemoveAll(tempDir)
 
 	// Create a mock LRPREV file
 	lrprevPath := filepath.Join(tempDir, "test-12345678-1234-1234-1234-123456789012.lrprev")
 	jpegContent := []byte{0xFF, 0xD8, 0xFF, 0xD9} // Minimal valid JPEG
-	err = ioutil.WriteFile(lrprevPath, append([]byte("prefix data"), jpegContent...), 0644)
+	err = os.WriteFile(lrprevPath, append([]byte("prefix data"), jpegContent...), 0644)
 	assert.NoError(t, err)
 
 	// Run the extraction
@@ -122,7 +121,7 @@ func TestExtractLargestJPEGFromLRPREV_WithoutDatabase(t *testing.T) {
 
 func TestExtractLargestJPEGFromLRPREV_IncludeSize(t *testing.T) {
 	// Create a temporary directory for the test
-	tempDir, err := ioutil.TempDir("", "lrprev_test")
+	tempDir, err := os.MkdirTemp("", "lrprev_test")
 	assert.NoError(t, err)
 	defer os.RemoveAll(tempDir)
 
@@ -134,7 +133,7 @@ func TestExtractLargestJPEGFromLRPREV_IncludeSize(t *testing.T) {
 		0xFF, 0xC0, 0x00, 0x11, 0x08, 0x00, 0x10, 0x00, 0x10, 0x03, 0x01, 0x22, 0x00, 0x02, 0x11, 0x01, 0x03, 0x11, 0x01, // SOF marker (16x16 image)
 		0xFF, 0xD9, // EOI marker
 	}
-	err = ioutil.WriteFile(lrprevPath, append([]byte("prefix data"), jpegContent...), 0644)
+	err = os.WriteFile(lrprevPath, append([]byte("prefix data"), jpegContent...), 0644)
 	assert.NoError(t, err)
 
 	// Run the extraction
@@ -149,14 +148,14 @@ func TestExtractLargestJPEGFromLRPREV_IncludeSize(t *testing.T) {
 
 func TestExtractLargestJPEGFromLRPREV_ExcludeSize(t *testing.T) {
 	// Create a temporary directory for the test
-	tempDir, err := ioutil.TempDir("", "lrprev_test")
+	tempDir, err := os.MkdirTemp("", "lrprev_test")
 	assert.NoError(t, err)
 	defer os.RemoveAll(tempDir)
 
 	// Create a mock LRPREV file
 	lrprevPath := filepath.Join(tempDir, "test-12345678-1234-1234-1234-123456789012.lrprev")
 	jpegContent := []byte{0xFF, 0xD8, 0xFF, 0xD9} // Minimal valid JPEG
-	err = ioutil.WriteFile(lrprevPath, append([]byte("prefix data"), jpegContent...), 0644)
+	err = os.WriteFile(lrprevPath, append([]byte("prefix data"), jpegContent...), 0644)
 	assert.NoError(t, err)
 
 	// Run the extraction
@@ -168,14 +167,3 @@ func TestExtractLargestJPEGFromLRPREV_ExcludeSize(t *testing.T) {
 	_, err = os.Stat(extractedPath)
 	assert.NoError(t, err)
 }
-
-import (
-	"database/sql"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-	_ "github.com/mattn/go-sqlite3"
-)
