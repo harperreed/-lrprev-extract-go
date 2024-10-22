@@ -23,6 +23,11 @@ This project aims to facilitate the management of your Lightroom previews and is
     go build -o lrprev-extract ./cmd/lrprev-extract
     ```
 
+3. Install required dependencies on Linux:
+    ```bash
+    sudo apt-get install -y libgl1-mesa-dev xorg-dev
+    ```
+
 ### Commands
 The main executable is `lrprev-extract`. You can invoke it from the command line with the following options:
 
