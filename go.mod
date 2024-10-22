@@ -20,3 +20,5 @@ require (
 	golang.org/x/term v0.24.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+require github.com/rivo/tview v0.0.0-20230910145600-2b9b7b9c8b0b
