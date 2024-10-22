@@ -7,10 +7,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/rivo/tview"
-	"github.com/gdamore/tcell/v2"
 	"lrprev-extract-go/internal/cli"
 	"lrprev-extract-go/internal/extractor"
+
+	"github.com/rivo/tview"
 )
 
 func main() {
@@ -61,37 +61,52 @@ func main() {
 	app := tview.NewApplication()
 	flex := tview.NewFlex().SetDirection(tview.FlexRow)
 
-	logView := tview.NewTextView().SetDynamicColors(true).SetScrollable(true).SetChangedFunc(func() {
-		app.Draw()
-	})
+	// Create a text view for logs
+	logView := tview.NewTextView().
+		SetDynamicColors(true).
+		SetScrollable(true).
+		SetChangedFunc(func() {
+			app.Draw()
+		})
 
-	progressBar := tview.NewProgressBar().SetMax(100).SetLabel("Overall Progress")
+	// Create a gauge for progress
+	gauge := tview.NewTextView().
+		SetDynamicColors(true).
+		SetTextAlign(tview.AlignCenter)
 
-	flex.AddItem(progressBar, 1, 0, false)
+	// Add items to the flex container
+	flex.AddItem(gauge, 1, 0, false)
 	flex.AddItem(logView, 0, 1, false)
 
 	go func() {
 		if fileInfo.IsDir() {
 			files, err := filepath.Glob(filepath.Join(inputPath, "**/*.lrprev"))
 			if err != nil {
-				log.Fatalf("Error finding .lrprev files: %v", err)
+				fmt.Fprintf(logView, "[red]Error finding .lrprev files: %v\n", err)
+				app.Stop()
+				return
 			}
 
 			totalFiles := len(files)
 			for i, file := range files {
+				progress := int(float64(i+1) / float64(totalFiles) * 100)
+				gauge.Clear()
+				fmt.Fprintf(gauge, "[yellow]Progress: [white]%d%%", progress)
+				app.Draw()
+
 				err := processFile(file, *outputDirectory, *lightroomDB, *includeSize, logView)
 				if err != nil {
 					fmt.Fprintf(logView, "[red]Error processing file %s: %v\n", file, err)
 				}
-				progress := int(float64(i+1) / float64(totalFiles) * 100)
-				progressBar.SetProgress(progress)
 			}
 		} else {
+			gauge.Clear()
+			fmt.Fprintf(gauge, "[yellow]Progress: [white]0%%")
 			err = processFile(inputPath, *outputDirectory, *lightroomDB, *includeSize, logView)
 			if err != nil {
 				fmt.Fprintf(logView, "[red]Error processing file: %v\n", err)
 			}
-			progressBar.SetProgress(100)
+			fmt.Fprintf(gauge, "[yellow]Progress: [white]100%%")
 		}
 
 		fmt.Fprintln(logView, "[green]Processing complete!")
