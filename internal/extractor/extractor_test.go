@@ -17,7 +17,8 @@ func TestExtractLargestJPEGFromLRPREV_Success(t *testing.T) {
 	defer os.RemoveAll(tempDir)
 
 	// Create a mock LRPREV file
-	lrprevPath := filepath.Join(tempDir, "test-12345678-1234-1234-1234-123456789012.lrprev")
+	uuid := "12345678-1234-1234-1234-123456789012"
+	lrprevPath := filepath.Join(tempDir, "test-"+uuid+".lrprev")
 	jpegContent := []byte{0xFF, 0xD8, 0xFF, 0xD9} // Minimal valid JPEG
 	err = os.WriteFile(lrprevPath, append([]byte("prefix data"), jpegContent...), 0644)
 	assert.NoError(t, err)
@@ -26,8 +27,8 @@ func TestExtractLargestJPEGFromLRPREV_Success(t *testing.T) {
 	err = ExtractLargestJPEGFromLRPREV(lrprevPath, tempDir, "", false)
 	assert.NoError(t, err)
 
-	// Check if the JPEG was extracted correctly
-	extractedPath := filepath.Join(tempDir, "test-12345678-1234-1234-1234-123456789012.jpg")
+	// Check if the JPEG was extracted correctly - note we're now checking for just the UUID in the output filename
+	extractedPath := filepath.Join(tempDir, uuid+".jpg")
 	_, err = os.Stat(extractedPath)
 	assert.NoError(t, err)
 
@@ -49,7 +50,8 @@ func TestExtractLargestJPEGFromLRPREV_NoValidJPEG(t *testing.T) {
 	defer os.RemoveAll(tempDir)
 
 	// Create a mock LRPREV file without a valid JPEG
-	lrprevPath := filepath.Join(tempDir, "test-12345678-1234-1234-1234-123456789012.lrprev")
+	uuid := "12345678-1234-1234-1234-123456789012"
+	lrprevPath := filepath.Join(tempDir, "test-"+uuid+".lrprev")
 	err = os.WriteFile(lrprevPath, []byte("not a valid JPEG"), 0644)
 	assert.NoError(t, err)
 
@@ -82,7 +84,8 @@ func TestExtractLargestJPEGFromLRPREV_WithDatabase(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Create a mock LRPREV file
-	lrprevPath := filepath.Join(tempDir, "test-12345678-1234-1234-1234-123456789012.lrprev")
+	uuid := "12345678-1234-1234-1234-123456789012"
+	lrprevPath := filepath.Join(tempDir, "test-"+uuid+".lrprev")
 	jpegContent := []byte{0xFF, 0xD8, 0xFF, 0xD9} // Minimal valid JPEG
 	err = os.WriteFile(lrprevPath, append([]byte("prefix data"), jpegContent...), 0644)
 	assert.NoError(t, err)
@@ -104,7 +107,8 @@ func TestExtractLargestJPEGFromLRPREV_WithoutDatabase(t *testing.T) {
 	defer os.RemoveAll(tempDir)
 
 	// Create a mock LRPREV file
-	lrprevPath := filepath.Join(tempDir, "test-12345678-1234-1234-1234-123456789012.lrprev")
+	uuid := "12345678-1234-1234-1234-123456789012"
+	lrprevPath := filepath.Join(tempDir, "test-"+uuid+".lrprev")
 	jpegContent := []byte{0xFF, 0xD8, 0xFF, 0xD9} // Minimal valid JPEG
 	err = os.WriteFile(lrprevPath, append([]byte("prefix data"), jpegContent...), 0644)
 	assert.NoError(t, err)
@@ -113,8 +117,8 @@ func TestExtractLargestJPEGFromLRPREV_WithoutDatabase(t *testing.T) {
 	err = ExtractLargestJPEGFromLRPREV(lrprevPath, tempDir, "", false)
 	assert.NoError(t, err)
 
-	// Check if the JPEG was extracted to the correct path
-	extractedPath := filepath.Join(tempDir, "12345678-1234-1234-1234-123456789012.jpg")
+	// Check if the JPEG was extracted to the correct path - note we're checking for just the UUID
+	extractedPath := filepath.Join(tempDir, uuid+".jpg")
 	_, err = os.Stat(extractedPath)
 	assert.NoError(t, err)
 }
@@ -126,7 +130,8 @@ func TestExtractLargestJPEGFromLRPREV_IncludeSize(t *testing.T) {
 	defer os.RemoveAll(tempDir)
 
 	// Create a mock LRPREV file with a valid JPEG (including JPEG header with dimensions)
-	lrprevPath := filepath.Join(tempDir, "test-12345678-1234-1234-1234-123456789012.lrprev")
+	uuid := "12345678-1234-1234-1234-123456789012"
+	lrprevPath := filepath.Join(tempDir, "test-"+uuid+".lrprev")
 	jpegContent := []byte{
 		0xFF, 0xD8, // SOI marker
 		0xFF, 0xE0, 0x00, 0x10, 'J', 'F', 'I', 'F', 0x00, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, // JFIF header
@@ -141,7 +146,7 @@ func TestExtractLargestJPEGFromLRPREV_IncludeSize(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Check if the JPEG was extracted with the correct filename (including dimensions)
-	extractedPath := filepath.Join(tempDir, "12345678-1234-1234-1234-123456789012_16x16.jpg")
+	extractedPath := filepath.Join(tempDir, uuid+"_16x16.jpg")
 	_, err = os.Stat(extractedPath)
 	assert.NoError(t, err)
 }
@@ -153,7 +158,8 @@ func TestExtractLargestJPEGFromLRPREV_ExcludeSize(t *testing.T) {
 	defer os.RemoveAll(tempDir)
 
 	// Create a mock LRPREV file
-	lrprevPath := filepath.Join(tempDir, "test-12345678-1234-1234-1234-123456789012.lrprev")
+	uuid := "12345678-1234-1234-1234-123456789012"
+	lrprevPath := filepath.Join(tempDir, "test-"+uuid+".lrprev")
 	jpegContent := []byte{0xFF, 0xD8, 0xFF, 0xD9} // Minimal valid JPEG
 	err = os.WriteFile(lrprevPath, append([]byte("prefix data"), jpegContent...), 0644)
 	assert.NoError(t, err)
@@ -163,7 +169,7 @@ func TestExtractLargestJPEGFromLRPREV_ExcludeSize(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Check if the JPEG was extracted with the correct filename (without dimensions)
-	extractedPath := filepath.Join(tempDir, "12345678-1234-1234-1234-123456789012.jpg")
+	extractedPath := filepath.Join(tempDir, uuid+".jpg")
 	_, err = os.Stat(extractedPath)
 	assert.NoError(t, err)
 }
