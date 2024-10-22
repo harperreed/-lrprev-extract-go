@@ -10,7 +10,7 @@ description = 'Remove all the various output.txts'                              
 [tasks]
 build = "go build -o lrprev-extract cmd/lrprev-extract/main.go"
 test = "go test -v ./... -coverprofile=coverage.out -covermode=atomic && go tool cover -html=coverage.out -o coverage.html"
-clean = "go clean && rm -f agent"
+clean = "go clean && rm -f lrprev-extract"
 lint = "golangci-lint run"
 lint-fix = "golangci-lint run --fix"
 lint-all = "golangci-lint run --enable-all"
